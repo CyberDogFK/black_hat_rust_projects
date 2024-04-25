@@ -10,7 +10,6 @@ use model::Subdomain;
 mod ports;
 mod subdomains;
 
-
 fn main() -> Result<(), anyhow::Error> {
     let args: Vec<String> = env::args().collect();
 
@@ -20,7 +19,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     let target = args[1].as_str();
 
-    let http_timeout = Duration::from_secs(5);
+    let http_timeout = Duration::from_secs(30);
     let http_client = Client::builder()
         .redirect(redirect::Policy::limited(4))
         .timeout(http_timeout)
@@ -39,16 +38,16 @@ fn main() -> Result<(), anyhow::Error> {
             .into_par_iter()
             .map(ports::scan_ports)
             .collect();
-        
+
         for subdomains in scan_result {
             println!("{}:", &subdomains.domain);
             for port in &subdomains.open_ports {
                 println!("    {}", port.port);
             }
-            
+
             println!();
         }
     });
-    
+
     Ok(())
 }
